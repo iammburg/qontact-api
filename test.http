@@ -1,0 +1,148 @@
+POST http://localhost:3000/api/users
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username" : "khannedy",
+  "password" : "rahasiaaaa",
+  "name" : "Eko Kurniawan"
+}
+
+###
+
+POST http://localhost:3000/api/users/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username" : "khannedy",
+  "password" : "rahasiaaaa"
+}
+
+###
+
+GET http://localhost:3000/api/users/current
+Content-Type: application/json
+Accept: application/json
+Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+
+###
+
+PATCH http://localhost:3000/api/users/current
+Content-Type: application/json
+Accept: application/json
+Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+
+{
+  "name" : "Eko Kurniawan Khannedy"
+}
+
+###
+
+DELETE http://localhost:3000/api/users/logout
+Content-Type: application/json
+Accept: application/json
+Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+
+###
+
+POST http://localhost:3000/api/contacts
+Content-Type: application/json
+Accept: application/json
+Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+
+{
+  "first_name" : "Jeki",
+  "last_name" : "Morro",
+  "email" : "joko@gmail.com",
+  "phone" : "324234234234"
+}
+
+###
+
+GET http://localhost:3000/api/contacts
+Content-Type: application/json
+Accept: application/json
+Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+
+###
+
+GET http://localhost:3000/api/contacts/20441
+Content-Type: application/json
+Accept: application/json
+Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+
+###
+
+PUT http://localhost:3000/api/contacts/20441
+Content-Type: application/json
+Accept: application/json
+Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+
+{
+    "id": 20441,
+    "first_name": "Jaki Updated",
+    "last_name": "Morro Updated",
+    "email": "joko@gmail.com",
+    "phone": "324234234234"
+}
+
+### Delete Contact
+
+DELETE http://localhost:3000/api/contacts/20441
+Content-Type: application/json
+Accept: application/json
+Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+
+### Create Address
+
+POST http://localhost:3000/api/contacts/20540/addresses
+Content-Type: application/json
+Accept: application/json
+Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+
+{
+  "street" : "Kantor Bekerja",
+  "city" : "Jakarta Pusat",
+  "province" : "DKI JAKARTA",
+  "country" : "Indonesia",
+  "postal_code" : "324234"
+}
+
+
+### List Addresses
+
+GET http://localhost:3000/api/contacts/20540/addresses
+Content-Type: application/json
+Accept: application/json
+Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+
+
+### Get Address
+
+GET http://localhost:3000/api/contacts/20540/addresses/904
+Content-Type: application/json
+Accept: application/json
+Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+
+### Update Address
+
+PUT http://localhost:3000/api/contacts/20540/addresses/904
+Content-Type: application/json
+Accept: application/json
+Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+
+{
+  "street" : "Kantor Bekerja 2",
+  "city" : "Bekasi Barat",
+  "province" : "Jawa Barat",
+  "country" : "Indonesia",
+  "postal_code" : "324234"
+}
+
+### Remove Address
+
+DELETE http://localhost:3000/api/contacts/20540/addresses/904
+Content-Type: application/json
+Accept: application/json
+Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
