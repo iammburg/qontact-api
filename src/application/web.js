@@ -4,20 +4,35 @@ import { errorMiddleware } from "../middleware/error-middleware.js";
 import { userRouter } from "../route/api.js";
 import cors from "cors";
 import session from "express-session";
+import { prismaClient } from "./database.js";
+import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 
 export const web = express();
+
 web.use(express.json());
 web.use(cors({
     origin: process.env.CORS_ORIGIN,
     credentials: true
 }));
+
+if (process.env.NODE_ENV === "production") {
+    web.set("trust proxy", 1);
+}
+
 web.use(session({
+    store: new PrismaSessionStore(prismaClient, {
+        checkPeriod: 2 * 60 * 1000,
+        dbRecordIdIsSessionId: true,
+        dbRecordIdFunction: undefined,
+    }),
+    name: "sid",
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    rolling: true,
     cookie: {
         httpOnly: true,
-        secure: false,
+        secure: process.env.NODE_ENV === "production" ? true : false,
         sameSite: "lax",
         maxAge: 1000 * 60 * 60
     }

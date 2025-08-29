@@ -10,20 +10,34 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL")
 }
 
 model User {
-  username String  @id @db.VarChar(100)
-  password String  @db.VarChar(100)
-  name     String  @db.VarChar(100)
-  token    String? @db.VarChar(100)
+  username String @id @db.VarChar(100)
+  password String @db.VarChar(100)
+  name     String @db.VarChar(100)
+  // token    String? @db.VarChar(100)
 
   contacts Contact[]
+  sessions Session[]
 
   @@map("users")
+}
+
+model Session {
+  id            String   @id @db.VarChar
+  sid           String   @unique @db.VarChar
+  data          Json
+  expiresAt     DateTime @db.Timestamp(6)
+  user_username String?  @db.VarChar(100)
+
+  user User? @relation(fields: [user_username], references: [username])
+
+  @@index([user_username], name: "idx_session_user_username")
+  @@map("session")
 }
 
 model Contact {
