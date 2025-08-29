@@ -29,17 +29,11 @@ const register = async (request) => {
     });
 };
 
-const login = async (request) => {
-    const loginRequest = validate(loginUserValidation, request);
+const login = async (req, res) => {
+    const loginRequest = validate(loginUserValidation, req.body);
 
     const user = await prismaClient.user.findUnique({
-        where: {
-            username: loginRequest.username,
-        },
-        select: {
-            username: true,
-            password: true,
-        }
+        where: { username: loginRequest.username }
     });
 
     if (!user) {
@@ -51,18 +45,12 @@ const login = async (request) => {
         throw new ResponseError(401, "Invalid username or password");
     }
 
-    const token = uuid().toString();
-    return prismaClient.user.update({
-        data: {
-            token: token
-        },
-        where: {
-            username: user.username
-        },
-        select: {
-            token: true
-        }
-    });
+    req.session.user = {
+        username: user.username,
+        name: user.name
+    };
+
+    return { message: "Login successful" };
 };
 
 const get = async (username) => {
@@ -118,30 +106,13 @@ const update = async (request) => {
     });
 };
 
-const logout = async (username) => {
-    username = validate(getUserValidation, username);
-
-    const user = await prismaClient.user.findUnique({
-        where: {
-            username: username,
+const logout = async (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            throw new ResponseError(500, "Logout failed");
         }
     });
-
-    if (!user) {
-        throw new ResponseError(404, "User not found");
-    }
-
-    return prismaClient.user.update({
-        where: {
-            username: username
-        },
-        data: {
-            token: null
-        },
-        select: {
-            username: true
-        }
-    });
+    return { message: "Logout successful" };
 };
 
 export default {
