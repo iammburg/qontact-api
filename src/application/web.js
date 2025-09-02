@@ -6,14 +6,19 @@ import cors from "cors";
 import session from "express-session";
 import { prismaClient } from "./database.js";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
+import helmet from "helmet";
+import { generateCsrfToken } from "../middleware/csrf-middleware.js";
 
 export const web = express();
 
-web.use(express.json());
+web.use(express.json({ limit: "1mb" }));
+web.use(express.urlencoded({ extended: true, limit: "1mb" }));
 web.use(cors({
     origin: process.env.CORS_ORIGIN,
     credentials: true
 }));
+web.use(helmet());
+web.disable("x-powered-by");
 
 if (process.env.NODE_ENV === "production") {
     web.set("trust proxy", 1);
@@ -25,7 +30,7 @@ web.use(session({
         dbRecordIdIsSessionId: true,
         dbRecordIdFunction: undefined,
     }),
-    name: "sid",
+    name: "connect.sid",
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
@@ -37,6 +42,9 @@ web.use(session({
         maxAge: 1000 * 60 * 60
     }
 }));
+
+// Generate CSRF token for all requests after session middleware
+web.use(generateCsrfToken);
 
 web.use(publicRouter);
 web.use(userRouter);
