@@ -1,148 +1,166 @@
+### Get CSRF Token (jalankan ini dulu)
+GET http://localhost:3000/api/csrf-token
+Content-Type: application/json
+Accept: application/json
+
+###
+### Register User (untuk testing dengan CSRF bypass)
 POST http://localhost:3000/api/users
 Content-Type: application/json
 Accept: application/json
+X-Test-Bypass: true
 
 {
-  "username" : "khannedy",
-  "password" : "rahasiaaaa",
-  "name" : "Eko Kurniawan"
+  "username" : "ndaru",
+  "password" : "password",
+  "name" : "Daru Daru"
 }
 
-###
-
+### Login User (akan membuat session cookie)
 POST http://localhost:3000/api/users/login
 Content-Type: application/json
 Accept: application/json
+X-Test-Bypass: true
 
 {
-  "username" : "khannedy",
-  "password" : "rahasiaaaa"
+  "username" : "ndaru",
+  "password" : "password"
 }
 
-###
-
+### Test Auth - Get Current User (harus login dulu)
 GET http://localhost:3000/api/users/current
 Content-Type: application/json
 Accept: application/json
-Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
 
-###
-
+### Test Auth - Update Current User (harus login dulu)
 PATCH http://localhost:3000/api/users/current
 Content-Type: application/json
 Accept: application/json
-Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+X-Test-Bypass: true
 
 {
-  "name" : "Eko Kurniawan Khannedy"
+  "name" : "Daru Daru 2"
 }
 
-###
-
-DELETE http://localhost:3000/api/users/logout
-Content-Type: application/json
-Accept: application/json
-Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
-
-###
-
+### Test Auth - Create Contact (harus login dulu)
 POST http://localhost:3000/api/contacts
 Content-Type: application/json
 Accept: application/json
-Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+X-Test-Bypass: true
 
 {
-  "first_name" : "Jeki",
+  "first_name" : "Jeki 4",
   "last_name" : "Morro",
   "email" : "joko@gmail.com",
   "phone" : "324234234234"
 }
 
-###
-
+### Test Auth - Get All Contacts (harus login dulu)
 GET http://localhost:3000/api/contacts
 Content-Type: application/json
 Accept: application/json
-Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
 
-###
-
-GET http://localhost:3000/api/contacts/20441
+### Test Auth - Get Contact by ID (harus login dulu - ganti ID sesuai hasil create)
+GET http://localhost:3000/api/contacts/4
 Content-Type: application/json
 Accept: application/json
-Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
 
-###
-
-PUT http://localhost:3000/api/contacts/20441
+### Test Auth - Update Contact (harus login dulu - ganti ID sesuai hasil create)
+PUT http://localhost:3000/api/contacts/4
 Content-Type: application/json
 Accept: application/json
-Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+X-Test-Bypass: true
 
 {
-    "id": 20441,
-    "first_name": "Jaki Updated",
+    "first_name": "Jaki Updated 3",
     "last_name": "Morro Updated",
-    "email": "joko@gmail.com",
-    "phone": "324234234234"
+    "email": "joko_updated@gmail.com",
+    "phone": "999888777666"
 }
 
-### Delete Contact
-
-DELETE http://localhost:3000/api/contacts/20441
+### Test Auth - Create Address (harus login dulu - ganti contact ID)
+POST http://localhost:3000/api/contacts/4/addresses
 Content-Type: application/json
 Accept: application/json
-Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
-
-### Create Address
-
-POST http://localhost:3000/api/contacts/20540/addresses
-Content-Type: application/json
-Accept: application/json
-Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+X-Test-Bypass: true
 
 {
-  "street" : "Kantor Bekerja",
+  "street" : "Kantor Bekerja 4",
   "city" : "Jakarta Pusat",
   "province" : "DKI JAKARTA",
   "country" : "Indonesia",
   "postal_code" : "324234"
 }
 
-
-### List Addresses
-
-GET http://localhost:3000/api/contacts/20540/addresses
+### Test Auth - Get All Addresses (harus login dulu - ganti contact ID)
+GET http://localhost:3000/api/contacts/4/addresses
 Content-Type: application/json
 Accept: application/json
-Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
 
-
-### Get Address
-
-GET http://localhost:3000/api/contacts/20540/addresses/904
+### Test Auth - Get Address by ID (harus login dulu - ganti contact & address ID)
+GET http://localhost:3000/api/contacts/4/addresses/4
 Content-Type: application/json
 Accept: application/json
-Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
 
-### Update Address
-
-PUT http://localhost:3000/api/contacts/20540/addresses/904
+### Test Auth - Update Address (harus login dulu - ganti contact & address ID)
+PUT http://localhost:3000/api/contacts/4/addresses/4
 Content-Type: application/json
 Accept: application/json
-Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+X-Test-Bypass: true
 
 {
-  "street" : "Kantor Bekerja 2",
+  "street" : "Kantor Bekerja Updated 3",
   "city" : "Bekasi Barat",
   "province" : "Jawa Barat",
   "country" : "Indonesia",
-  "postal_code" : "324234"
+  "postal_code" : "555666"
 }
 
-### Remove Address
-
-DELETE http://localhost:3000/api/contacts/20540/addresses/904
+### Test Auth - Delete Address (harus login dulu - ganti contact & address ID)
+DELETE http://localhost:3000/api/contacts/4/addresses/4
 Content-Type: application/json
 Accept: application/json
-Authorization: 0198b3ec-3fc7-71e3-838a-4377db2123a6
+X-Test-Bypass: true
+
+### Test Auth - Delete Contact (harus login dulu - ganti contact ID)
+DELETE http://localhost:3000/api/contacts/3
+Content-Type: application/json
+Accept: application/json
+X-Test-Bypass: true
+
+### Logout User (akan menghapus session cookie)
+DELETE http://localhost:3000/api/users/logout
+Content-Type: application/json
+Accept: application/json
+X-Test-Bypass: true
+
+### Test Access After Logout (should fail)
+GET http://localhost:3000/api/users/current
+Content-Type: application/json
+Accept: application/json
+
+###
+
+# Testing Flow untuk Session Cookie Authentication:
+
+# 1. Register user baru (jika belum ada)
+# 2. Login user - ini akan membuat session cookie yang otomatis disimpan
+# 3. Test endpoint yang memerlukan auth - cookie session akan otomatis dikirim
+# 4. Test unauthorized access (tanpa login)
+# 5. Logout - ini akan menghapus session cookie
+# 6. Test access setelah logout (should fail)
+
+# Catatan:
+# - Setelah login, VS Code / HTTP client akan otomatis menyimpan dan mengirim session cookie
+# - Tidak perlu manual menambahkan Authorization header
+# - Session cookie akan otomatis included dalam setiap request selanjutnya
+# - Pastikan server berjalan di http://localhost:3000
+# - Ganti ID contact/address sesuai dengan yang dikembalikan dari create operations
+
+# CSRF Protection:
+# - Header X-Test-Bypass: true digunakan untuk bypass CSRF di development
+# - Di production, gunakan header X-XSRF-TOKEN dengan token dari cookie XSRF-TOKEN
+# - Untuk mendapatkan CSRF token, hit endpoint GET /api/csrf-token terlebih dahulu
+# - Contoh production request:
+#   1. GET /api/csrf-token untuk mendapatkan token
+#   2. Gunakan token di header: X-XSRF-TOKEN: {token_dari_response}

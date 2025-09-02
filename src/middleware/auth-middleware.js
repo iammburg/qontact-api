@@ -1,25 +1,26 @@
-import { prismaClient } from "../application/database.js";
+import rateLimit from "express-rate-limit";
 
-export const authMiddleware = async (req, res, next) => {
-    const token = req.get('Authorization');
-    if (!token) {
-        res.status(401).json({
-            errors: 'Unauthorized'
-        }).end();
-    } else {
-        const user = await prismaClient.user.findFirst({
-            where: {
-                token: token,
-            }
+export const authMiddleware = (req, res, next) => {
+    if (!req.session || !req.session.user) {
+        return res.status(401).json({
+            errors: "Unauthorized",
+            message: "Please login to access this resource"
         });
-
-        if (!user) {
-            res.status(401).json({
-                errors: 'Unauthorized'
-            }).end();
-        } else {
-            req.user = user;
-            next();
-        }
     }
+
+    if (!req.session.user.username) {
+        return res.status(401).json({
+            errors: "Invalid session",
+            message: "Session corrupted, please login again"
+        });
+    }
+    req.user = req.session.user;
+    next();
 };
+
+export const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+});

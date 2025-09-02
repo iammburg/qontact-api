@@ -3,7 +3,6 @@ import { loginUserValidation, registerUserValidation, getUserValidation, updateU
 import { prismaClient } from "../application/database.js";
 import { ResponseError } from "../error/response-error.js";
 import bcrypt from "bcrypt";
-import { v7 as uuid } from "uuid";
 
 const register = async (request) => {
     const user = validate(registerUserValidation, request);
@@ -29,17 +28,11 @@ const register = async (request) => {
     });
 };
 
-const login = async (request) => {
-    const loginRequest = validate(loginUserValidation, request);
+const login = async (req, res) => {
+    const loginRequest = validate(loginUserValidation, req.body);
 
     const user = await prismaClient.user.findUnique({
-        where: {
-            username: loginRequest.username,
-        },
-        select: {
-            username: true,
-            password: true,
-        }
+        where: { username: loginRequest.username }
     });
 
     if (!user) {
@@ -51,18 +44,36 @@ const login = async (request) => {
         throw new ResponseError(401, "Invalid username or password");
     }
 
-    const token = uuid().toString();
-    return prismaClient.user.update({
-        data: {
-            token: token
-        },
-        where: {
-            username: user.username
-        },
-        select: {
-            token: true
-        }
+    await new Promise((resolve, reject) => {
+        req.session.regenerate(async (err) => {
+            if (err)
+                return reject(new ResponseError(500, "Session regeneration failed"));
+
+            req.session.user = {
+                username: user.username,
+                name: user.name,
+            };
+
+            req.session.save(async (err2) => {
+                if (err2)
+                    return reject(new ResponseError(500, "Failed to save session"));
+                try {
+                    await prismaClient.session.update({
+                        where: { id: req.sessionID },
+                        data: { user_username: user.username },
+                    });
+
+                    resolve();
+                } catch (dbErr) {
+                    reject(
+                        new ResponseError(500, "Failed to update session user mapping")
+                    );
+                }
+            });
+        });
     });
+
+    return { message: "Login successful" };
 };
 
 const get = async (username) => {
@@ -118,29 +129,30 @@ const update = async (request) => {
     });
 };
 
-const logout = async (username) => {
-    username = validate(getUserValidation, username);
+const logout = async (req, res) => {
+    return await new Promise((resolve, reject) => {
+        const sid = req.sessionID;
 
-    const user = await prismaClient.user.findUnique({
-        where: {
-            username: username,
-        }
-    });
+        req.session.destroy(async (err) => {
+            if (err) return reject(new ResponseError(500, "Logout failed"));
 
-    if (!user) {
-        throw new ResponseError(404, "User not found");
-    }
+            res.clearCookie("sid", {
+                path: "/",
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax",
+            });
 
-    return prismaClient.user.update({
-        where: {
-            username: username
-        },
-        data: {
-            token: null
-        },
-        select: {
-            username: true
-        }
+            try {
+                await prismaClient.session.delete({
+                    where: { id: sid },
+                });
+            } catch (e) {
+                console.error("Failed to delete session from DB", e);
+            }
+
+            resolve({ message: "Logout successful" });
+        });
     });
 };
 
